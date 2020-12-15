@@ -39,6 +39,7 @@ const directions = {
   up: ()=> this.video.volume+=0.1,
   down: ()=> this.video.volume-=0.1,
 }
+
 document.onkeydown = (event)=> {
   // 左上右下 37 38 39 40
   let key = event.keyCode

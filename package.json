@@ -1,0 +1,27 @@
+{
+  "name": "small-icon",
+  "version": "1.0.0",
+  "description": ":trollface: favico for fun",
+  "main": "app.js",
+  "scripts": {
+    "start": "webpack-dev-server --open"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Arrow-zb/small-icon.git"
+  },
+  "keywords": [],
+  "author": "paopao-arrow",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Arrow-zb/small-icon/issues"
+  },
+  "homepage": "https://github.com/Arrow-zb/small-icon#readme",
+  "devDependencies": {
+    "clean-webpack-plugin": "^3.0.0",
+    "html-webpack-plugin": "^4.5.0",
+    "webpack": "^5.10.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  }
+}

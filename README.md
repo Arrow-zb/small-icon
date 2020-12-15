@@ -1,65 +1,127 @@
-# iconjs
-:trollface: favico for fun
+# 1. small-icon
+借鉴大圣老师的思想，自己重写了一遍！
 
-[English](./README-EN.md)
+## 2.icon 播放视频
+一步一步的实现，这样不会觉得很突然。
+### 2.1 在网页上播放视频
 
+```js
+// video.js
+class Video {
+	constructor(url, width, height) {
+		this.url = url;
+		this.width = width;
+		this.height = height;
+		this.video = this.initVideo();
+	}
 
-## 在线体验
-[Live Demo](https://shengxinjing.cn/wheel/moyu.html)
+	initVideo() {
+		const video = document.createElement('video');
+    video.src = this.url || 'https://v-cdn.zjol.com.cn/280443.mp4';
+    video.autoplay = 'autoplay';
+    video.controls = 'controls';
+    video.width = this.width ||  32;
+    video.height = this.height || 32;
+    document.body.append(video);
+    return video;
+	}
+}
 
-
-## 安装
+export default Video;
+```
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/shengxinjing/iconjs@0.1/icon.js" ></script >
+<script type="module">
+  import Video from "../video.js";
+  new Video('https://v-cdn.zjol.com.cn/276984.mp4', 100, 100);
+</script>
 ```
-
-
-
-
-## 演示
-[Live Demo](https://shengxinjing.cn/wheel/moyu.html)
-## 看视频
-
-上下控制音量
-
-左右控制前进后退5秒
-
+### 2.2 实现快进快退、音量增减和显示当前进度
+1. 实现快进快退和音量增减
+也就是键盘事件，上下左右。
+document.onkeydown 事件通过keycode来处理不同的事件
 ```js
-    var m = new Icon()
-    m.initVideo('http://image.shengxinjing.cn/moyu/video/ji.mp4')
+	initKeybordEvents() {
+		const keyCodeToDirection = {
+			38: () => {
+				if(this.video.volume >= 1){
+					return;
+				}else {
+					this.video.volume += 0.1
+				}
+			},
+			40: () => {
+				if(this.video.volume < 0.1){
+					return;
+				}else {
+					this.video.volume -= 0.1
+				}
+			},
+			37: () => this.video.currentTime -= 5,
+			39: () => this.video.currentTime += 5
+		}
+		document.onkeydown = e => {
+			if(keyCodeToDirection.hasOwnProperty(e.keyCode)){
+				keyCodeToDirection[e.keyCode]()
+			}
+		}
+  }
 ```
+2. 显示当前进度
+```js
+	showProgress() {
+		let progress = this.video.currentTime / this.video.duration;
+		const progressTxt = document.createElement('p');
+		// progressTxt.innerHTML = isNaN(progress) ? 0 : progress;
+		progressTxt.innerHTML = this.formatTime(this.video.currentTime) + '/' +  this.formatTime(this.video.duration);
+		document.body.appendChild(progressTxt);
+	}
 
+	formatTime(second) {
+		// 这里可更换为moment.js
+		const m = Math.floor(second / 60) + ''
+		const s = parseInt(second % 60) + ''
+		return m.padStart(2,'0')+":"+s.padStart(2,'0')
+	}
 
-
-![](./img/01-video.gif)
-
+	onVideoEvent() {
+		this.video.ontimeupdate = e => {
+			this.showProgress();
+		}
+	}
+```
+### 2.3 一切准备就绪，将视频放到canvas中
+```js
+  videoToCanvas(){
+    const context = this.canvas.getContext('2d');
+    // 每次更新都先清空canvas
+    context.clearRect(0, 0, this.width, this.height);
+    // 将video渲染到canvas上
+    context.drawImage(this.video, 0, 0, this.width, this.height);
+  }
+```
+### 2.4 将canvas放到ico中
+这里关键是canvas可以转化为icon可用的URL
+```js
+canvasToIcon() {
+    const url = this.canvas.toDataURL('image/png');
+    const link = Array.from(document.head.querySelectorAll('link'))
+      .filter(l =>
+        l.getAttribute('rel').indexOf('icon') > -1 
+      );
+    if(link.length) {
+      link.forEach(l => {
+        l.setAttribute('href', url);
+      });
+    }else {
+      const l = document.createElement('link');
+      l.setAttribute('href', url);
+      l.setAttribute('rel', 'shortcut icon');
+      l.setAttribute('type', 'image/x-icon');
+      document.head.appendChild(l);
+    }
+  }
+```
 ## 摄像头
 
-无聊的功能，我还加了个滤镜
-
-```js
-var m = new Icon()
-m.initCam()
-```
-
-![](./img/02-cam.gif)
-
-灰色滤镜
-
-![](./img/02-cam-filter.gif)
-
-怀旧滤镜
-
-![](./img/02-cam-filter2.gif)
-
 ## 贪食蛇
-
-上下左右，title显示分数和记录
-
-```js
-var s = new Snake()
-s.init()
-```
-
-![](./img/03-snake.gif)
