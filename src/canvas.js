@@ -11,7 +11,7 @@ class Canvas {
     this.canvas.height = this.height;
     document.body.appendChild(this.canvas);
   }
-
+  
   canvasToIcon() {
     const url = this.canvas.toDataURL('image/png');
     const link = Array.from(document.head.querySelectorAll('link'))
